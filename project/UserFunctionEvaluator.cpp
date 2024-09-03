@@ -40,7 +40,7 @@ UserFunctionEvaluator::UserFunctionEvaluator(string strFunction)
 	this->RPNfunction = infixToRPN(strFunction);
 }
 
-
+UserFunctionEvaluator::UserFunctionEvaluator() {}
 
 UserFunctionEvaluator::~UserFunctionEvaluator() {}
 
@@ -50,74 +50,71 @@ complex UserFunctionEvaluator::evaluate(const complex& input)
 {
 	stack<complex> stack;
 
-
 	for (const auto& c : RPNfunction)
 	{
-		complex x1, x2;
-
-		std::visit([&stack, &x1, &x2, input, this](auto&& arg)
+		if (std::holds_alternative<string>(c))
+		{
+			string arg = std::get<string>(c);
+			if (arg == "+")
 			{
-				using T = std::decay_t<decltype(arg)>;
+				complex x1 = stack.top();
+				stack.pop();
+				complex x2 = stack.top();
+				stack.pop();
+				stack.push(x1 + x2);
+			}
+			
+			else if (arg == "*")
+			{
+				complex x1 = stack.top();
+				stack.pop();
+				complex x2 = stack.top();
+				stack.pop();
+				stack.push(x1 * x2);
+			}
+			
+			else if (arg == "-")
+			{
+				complex x1 = stack.top();
+				stack.pop();
+				complex x2 = stack.top();
+				stack.pop();
+				stack.push(x2 - x1);
+			}
+			
+			else if (arg == "/")
+			{
+				complex x1 = stack.top();
+				stack.pop();
+				complex x2 = stack.top();
+				stack.pop();
+				stack.push(x2 / x1);
+			}
 
-				if constexpr (std::is_same_v<T, complex>)
-				{
-					stack.push(arg);
-				}
-				else if constexpr (std::is_same_v<T, string>)
-				{
-					if (arg == "+")
-					{
-						x1 = stack.top();
-						stack.pop();
-						x2 = stack.top();
-						stack.pop();
-						stack.push(x1 + x2);
-					}
-					else if (arg == "*")
-					{
-						x1 = stack.top();
-						stack.pop();
-						x2 = stack.top();
-						stack.pop();
-						stack.push(x1 * x2);
-					}
-					else if (arg == "-")
-					{
-						x1 = stack.top();
-						stack.pop();
-						x2 = stack.top();
-						stack.pop();
-						stack.push(x2 - x1);
-					}
-					else if (arg == "/")
-					{
-						x1 = stack.top();
-						stack.pop();
-						x2 = stack.top();
-						stack.pop();
-						stack.push(x2 / x1);
-					}
+			else if (arg == "z")
+			{
+				stack.push(input);
+			}
 
-					else if (arg == "z")
-					{
-						stack.push(input);
-					}
-
-					else
-					{
-						if (ComplexFunctionMap.find(arg) == ComplexFunctionMap.end())
-						{
-							std::cerr << "Error: Function '" << arg << "' not found in function map.\n";
-							return;
-						}
+			else
+			{
+				//if (ComplexFunctionMap.find(arg) == ComplexFunctionMap.end())
+				//{
+				//	std::cerr << "Error: Function '" << arg << "' not found in function map.\n";
+				//	return complex(0,0);
+				//}
 
 
-						x1 = stack.top();
-						stack.pop();
-						stack.push(ComplexFunctionMap[arg](x1));
-					}
-				}
-			}, c);
+				complex x1 = stack.top();
+				stack.pop();
+				stack.push(ComplexFunctionMap[arg](x1));
+			}
+		}
+		else
+		{
+			complex arg = std::get<complex>(c);
+			stack.push(arg);
+		}
 	}
 	return stack.top();
 }

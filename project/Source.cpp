@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <complex>
 #include <thread>
+#include <functional>
 
 #include "SpriteGenerator.h"
 #include "UserFunctionEvaluator.h"
+#include <chrono>
 
 
 using std::string, std::vector;
@@ -14,9 +16,13 @@ using complex = std::complex<float>;
 
 int main()
 {
-	auto cFunction = [](complex z) -> complex { 
-		return std::cos(z);
-	};
+	string inputFunction;
+	std::cout << "Input Function:\n";
+	std::cin >> inputFunction;
+
+	UserFunctionEvaluator evaluator(inputFunction);
+
+
 
 	// setting up the window
 	const int WIDTH = 1000;
@@ -34,7 +40,7 @@ int main()
 	// creating initial sprite
 	std::pair<float, float> center = { 0, 0 };
 	sf::Sprite finalSprite;
-	SpriteGenerator spriteGenerator(windowDim, center, imageScaleFactor, cFunction);
+	SpriteGenerator spriteGenerator(windowDim, center, imageScaleFactor, evaluator);
 	spriteGenerator.generateSprite(finalSprite);
 
 
@@ -96,6 +102,8 @@ int main()
 					if (event.mouseButton.button == sf::Mouse::Left)
 					{
 						isDragging = false;
+						
+						auto start = std::chrono::high_resolution_clock::now();
 
 						float deltaX = ((view.getCenter().x / (float)WIDTH) - 0.5f) * 10 / textureZoomFactor;
 						float deltaY = ((0.5f - view.getCenter().y / (float)HEIGHT)) * 10 / textureZoomFactor;
@@ -106,6 +114,11 @@ int main()
 						spriteGenerator.generateSprite(finalSprite, textureZoomFactor);
 
 						view.reset(sf::FloatRect(0, 0, WIDTH, HEIGHT));
+
+						auto end = std::chrono::high_resolution_clock::now();
+						auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+						cout << "Rerender took: " << duration << " milliseconds\n";
 					}
 					break;
 

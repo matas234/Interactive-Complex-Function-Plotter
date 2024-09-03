@@ -37,6 +37,8 @@ class UserFunctionEvaluator {
 public:
 	UserFunctionEvaluator(string strFunction);
 
+	UserFunctionEvaluator();
+
 	~UserFunctionEvaluator();
 
 	complex evaluate(const complex& input);
@@ -52,7 +54,7 @@ private:
 	unordered_set<char> validOperators = { '+', '-', '/', '*','^' };
 	unordered_set<string> validFunctions = { "sin", "cos" , "tan", "sinh", "cosh", "tanh", "exp", "log", "abs", "sqrt" };
 
-	// Define the unordered map to store function pointers
+	// hash map to store standard function pointers (probably need to add more)
 	std::unordered_map<std::string, complex(*)(const complex&)> ComplexFunctionMap = {
 		{ "sin", sinFunction },
 		{ "cos", cosFunction },

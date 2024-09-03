@@ -6,15 +6,9 @@
 #include <functional>
 #include "SpriteGenerator.h"
 
-
-
 using std::string, std::vector;
 
 using complex = std::complex<float>;
-
-
-
-
 
 // converts HSV colour format to RGB.
 void HSVtoRGB(float H, float S, float V, float& R, float& G, float& B)

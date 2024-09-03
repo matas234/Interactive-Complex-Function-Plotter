@@ -6,6 +6,9 @@
 #include <algorithm>
 #include <complex>
 #include <thread>
+#include <functional>
+
+#include "UserFunctionEvaluator.h"
 
 
 using std::string, std::vector;
@@ -19,7 +22,7 @@ using complex = std::complex<float>;
 void HSVtoRGB(float H, float S, float V, float& R, float& G, float& B);
 
 
-float normalizeAbs(float x, float low_value = 0.3, float scale = 0.3);
+float normalizeAbs(float x, float low_value = 0, float scale = 0.1);
 
 
 sf::Color imageToColour(const complex& c, const sf::Vector2u& windowSize,
@@ -35,7 +38,10 @@ sf::Vector2f complexToPoint(const complex& c, const sf::Vector2u& windowDim,
 class SpriteGenerator {
 public:
 
-	SpriteGenerator(const sf::Vector2u& windowDim, std::pair<float, float> center, unsigned int imageScaleFactor, complex(*funcToMap)(complex));
+	SpriteGenerator(const sf::Vector2u& windowDim,
+					std::pair<float, float> center, 
+					unsigned int imageScaleFactor, 
+					UserFunctionEvaluator& evaluator);
 
 	~SpriteGenerator();
 
@@ -45,7 +51,7 @@ public:
 
 private:
 	unsigned int imageScaleFactor;
-	complex cFunction;
+	UserFunctionEvaluator evaluator;
 
 	sf::Vector2u windowDim;
 	sf::Vector2u originalImageDim;
@@ -53,7 +59,7 @@ private:
 	sf::Shader* shader;
 	sf::Texture* texture;
 	sf::RenderTexture* renderTexture;
-	complex(*funcToMap)(complex);
+	std::function<complex(const complex&)> funcToMap;
 
 	std::pair<float, float> center;
 
