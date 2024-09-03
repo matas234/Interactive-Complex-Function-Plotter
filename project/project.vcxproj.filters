@@ -18,13 +18,18 @@
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UserFunctionEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SpriteGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\..\..\..\Battlestate Games\BsgLauncher\Content\js\plugins\slick\fonts\slick.ttf" />
-    <Font Include="..\..\..\..\Downloads\JMH Typewriter-Thin.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Header.h">
+    <ClInclude Include="SpriteGenerator.h">
+      <Filter>Source Files\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UserFunctionEvaluator.h">
       <Filter>Source Files\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

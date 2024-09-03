@@ -106,6 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\libraries\SFML-2.6.1\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -123,6 +124,8 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\libraries\SFML-2.6.1\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -135,13 +138,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="UserFunctionEvaluator.cpp" />
+    <ClCompile Include="SpriteGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="..\..\..\..\..\..\Battlestate Games\BsgLauncher\Content\js\plugins\slick\fonts\slick.ttf" />
-    <Font Include="..\..\..\..\Downloads\JMH Typewriter-Thin.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Header.h" />
+    <ClInclude Include="UserFunctionEvaluator.h" />
+    <ClInclude Include="SpriteGenerator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
