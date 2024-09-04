@@ -19,20 +19,6 @@ using complex = std::complex<float>;
 using Variant_Type = std::variant<complex, string>;
 
 
-static complex sinFunction(const complex& z) { return std::sin(z); }
-static complex cosFunction(const complex& z) { return std::cos(z); }
-static complex tanFunction(const complex& z) { return std::tan(z); }
-static complex sinhFunction(const complex& z) { return std::sinh(z); }
-static complex coshFunction(const complex& z) { return std::cosh(z); }
-static complex tanhFunction(const complex& z) { return std::tanh(z); }
-static complex expFunction(const complex& z) { return std::exp(z); }
-static complex logFunction(const complex& z) { return std::log(z); }
-static complex absFunction(const complex& z) { return std::abs(z); }
-static complex sqrtFunction(const complex& z) { return std::sqrt(z); }
-
-
-
-
 
 
 UserFunctionEvaluator::UserFunctionEvaluator(string strFunction)
@@ -55,41 +41,17 @@ complex UserFunctionEvaluator::evaluate(const complex& input)
 		if (std::holds_alternative<string>(c))
 		{
 			string arg = std::get<string>(c);
-			if (arg == "+")
+
+			// if an operator
+			if (validOperators.find(arg[0]) != validOperators.end())
 			{
-				complex x1 = stack.top();
-				stack.pop();
-				complex x2 = stack.top();
-				stack.pop();
-				stack.push(x1 + x2);
+				complex x1 = stack.top();  stack.pop();
+				complex x2 = stack.top();  stack.pop();
+
+				stack.push(ComplexOperatorMap[arg](x2, x1));
 			}
-			
-			else if (arg == "*")
-			{
-				complex x1 = stack.top();
-				stack.pop();
-				complex x2 = stack.top();
-				stack.pop();
-				stack.push(x1 * x2);
-			}
-			
-			else if (arg == "-")
-			{
-				complex x1 = stack.top();
-				stack.pop();
-				complex x2 = stack.top();
-				stack.pop();
-				stack.push(x2 - x1);
-			}
-			
-			else if (arg == "/")
-			{
-				complex x1 = stack.top();
-				stack.pop();
-				complex x2 = stack.top();
-				stack.pop();
-				stack.push(x2 / x1);
-			}
+
+
 
 			else if (arg == "z")
 			{
@@ -98,11 +60,11 @@ complex UserFunctionEvaluator::evaluate(const complex& input)
 
 			else
 			{
-				//if (ComplexFunctionMap.find(arg) == ComplexFunctionMap.end())
-				//{
-				//	std::cerr << "Error: Function '" << arg << "' not found in function map.\n";
-				//	return complex(0,0);
-				//}
+				if (ComplexFunctionMap.find(arg) == ComplexFunctionMap.end())
+				{
+					std::cerr << "Error: Function '" << arg << "' not found in function map.\n";
+					return complex(0,0);
+				}
 
 
 				complex x1 = stack.top();
@@ -310,3 +272,47 @@ vector<Variant_Type> UserFunctionEvaluator::infixToRPN(string postFix)
 
 }
 
+
+
+complex UserFunctionEvaluator::sinFunction(const complex& z) { return std::sin(z); }
+complex UserFunctionEvaluator::cosFunction(const complex& z) { return std::cos(z); }
+complex UserFunctionEvaluator::tanFunction(const complex& z) { return std::tan(z); }
+complex UserFunctionEvaluator::sinhFunction(const complex& z) { return std::sinh(z); }
+complex UserFunctionEvaluator::coshFunction(const complex& z) { return std::cosh(z); }
+complex UserFunctionEvaluator::tanhFunction(const complex& z) { return std::tanh(z); }
+complex UserFunctionEvaluator::expFunction(const complex& z) { return std::exp(z); }
+complex UserFunctionEvaluator::logFunction(const complex& z) { return std::log(z); }
+complex UserFunctionEvaluator::absFunction(const complex& z) { return std::abs(z); }
+complex UserFunctionEvaluator::sqrtFunction(const complex& z) { return std::sqrt(z); }
+
+complex UserFunctionEvaluator::plusOperator(const complex& x, const complex& y) { return x + y; }
+complex UserFunctionEvaluator::minusOperator(const complex& x, const complex& y) { return x - y; }
+complex UserFunctionEvaluator::timesOperator(const complex& x, const complex& y) { return x * y; }
+complex UserFunctionEvaluator::divideOperator(const complex& x, const complex& y) { return x / y; }
+
+
+
+
+unordered_set<char> UserFunctionEvaluator::validOperators = { '+', '-', '/', '*', '^' };
+
+unordered_set<string> UserFunctionEvaluator::validFunctions = { "sin", "cos", "tan", "sinh", "cosh", "tanh", "exp", "log", "abs", "sqrt" };
+
+unordered_map<string, complex(*)(const complex&)> UserFunctionEvaluator::ComplexFunctionMap = {
+	{ "sin", sinFunction },
+	{ "cos", cosFunction },
+	{ "tan", tanFunction },
+	{ "sinh", sinhFunction },
+	{ "cosh", coshFunction },
+	{ "tanh", tanhFunction },
+	{ "exp", expFunction },
+	{ "log", logFunction },
+	{ "abs", absFunction },
+	{ "sqrt", sqrtFunction }
+};
+
+unordered_map<string, complex(*)(const complex&, const complex&)> UserFunctionEvaluator::ComplexOperatorMap = {
+	{ "*", timesOperator},
+	{ "+", plusOperator},
+	{ "-", minusOperator},
+	{ "/", divideOperator}
+};

@@ -106,7 +106,7 @@ int main()
 						auto start = std::chrono::high_resolution_clock::now();
 
 						float deltaX = ((view.getCenter().x / (float)WIDTH) - 0.5f) * 10 / textureZoomFactor;
-						float deltaY = ((0.5f - view.getCenter().y / (float)HEIGHT)) * 10 / textureZoomFactor;
+						float deltaY = ((view.getCenter().y / (float)HEIGHT - 0.5f)) * 10 / textureZoomFactor;
 						center.first += deltaX;
 						center.second += deltaY;
 

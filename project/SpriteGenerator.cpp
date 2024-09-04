@@ -4,6 +4,8 @@
 #include <complex>
 #include <thread>
 #include <functional>
+#include <algorithm>
+
 #include "SpriteGenerator.h"
 
 
@@ -80,8 +82,7 @@ float normalizeAbs(float x, float low_value, float scale)
 // maps the image of a complex number under a function to a colour to be drawn on the screen.
 sf::Color imageToColour(const complex& c, const sf::Vector2u& windowSize,
 						const float x1, const float x2,
-						const float y1, const float y2,
-						bool isGrid)
+						const float y1, const float y2)
 {
 
 	// if a pole then return pure white
@@ -93,7 +94,7 @@ sf::Color imageToColour(const complex& c, const sf::Vector2u& windowSize,
 	float hue = std::fmod((std::arg(c) * 360 / 6.28318530718) + 360.0, 360.0);
 
 	float R, G, B;
-	HSVtoRGB(hue, normalizeAbs(std::abs(c)), 1.0f - 0.5f*isGrid, R, G, B);
+	HSVtoRGB(hue, normalizeAbs(std::abs(c)), 1.0f, R, G, B);
 
 	return sf::Color(R, G, B, 255);
 
@@ -126,32 +127,27 @@ SpriteGenerator::SpriteGenerator(const sf::Vector2u& windowDim,
 {
 
 	this->windowDim = windowDim;
+
 	this->center = center;
+
 	this->imageScaleFactor = imageScaleFactor;
+
 	this->evaluator = evaluator;
 
 	this->originalImageDim = sf::Vector2u(windowDim.x / imageScaleFactor, windowDim.y / imageScaleFactor);
 
 	this->texture = new sf::Texture;
-	this->renderTexture = new sf::RenderTexture;
-	this->shader = new sf::Shader;
 
-	this->shader->loadFromFile("BlurShader.frag", sf::Shader::Fragment);
-	this->shader->setUniform("resolution", sf::Vector2f(windowDim.x, windowDim.y));
-	this->shader->setUniform("radius", 2.0f);
-	this->shader->setUniform("sigmaColor", 30.0f);
-	this->shader->setUniform("sigmaSpace", 5.0f);
 }
 
 SpriteGenerator::~SpriteGenerator()
 {
 	delete texture;
-	delete renderTexture;
-	delete shader;
+
 }
 
 
-void SpriteGenerator::generateSprite(sf::Sprite& finalSprite, float zoom, bool useBlur)
+void SpriteGenerator::generateSprite(sf::Sprite& finalSprite, float zoom)
 {
 
 	// Generating the image
@@ -179,32 +175,18 @@ void SpriteGenerator::generateSprite(sf::Sprite& finalSprite, float zoom, bool u
 	//// turning the image into a texture
 	texture->loadFromImage(image);
 
-
-	//// turning the texture into a sprite and scaling it by the imageScaleFactor
-	sf::Sprite sprite;
-	sprite.setTexture(*texture);
-	sprite.setScale(imageScaleFactor, imageScaleFactor);
-
-
-	renderTexture->create(windowDim.x, windowDim.y);
-	if (useBlur)
-	{
-		shader->setUniform("texture", *texture);
-		renderTexture->draw(sprite, shader);
-	}
-	else
-	{
-		renderTexture->draw(sprite);
-	}
-
-	sf::Image(renderTexture->getTexture().copyToImage()).saveToFile("output2.png");
-
-	finalSprite = sf::Sprite(renderTexture->getTexture());
+	finalSprite.setTexture(*texture);
+	finalSprite.setScale(imageScaleFactor, imageScaleFactor);
 }
 
 void SpriteGenerator::setCenter(const std::pair<float, float>& center)
 {
 	this->center = center;
+}
+
+void SpriteGenerator::setEvaluator(const UserFunctionEvaluator& evaluator)
+{
+	this->evaluator = evaluator;
 }
 
 void SpriteGenerator::drawImageChunk(sf::Image& image, unsigned int startY, unsigned int endY, float zoom)
@@ -218,26 +200,19 @@ void SpriteGenerator::drawImageChunk(sf::Image& image, unsigned int startY, unsi
 	const float y1 = center.second - temp;
 	const float y2 = center.second + temp;
 
+	const float c1 = (x2 - x1) / originalImageDim.x;
+	const float c2 = (y2 - y1) / originalImageDim.y;
+
 	for (unsigned int curX = 0; curX < originalImageDim.x; ++curX)
 	{
 		for (unsigned int curY = startY; curY < endY; ++curY)
 		{
-			complex curCompl(x1 + (x2 - x1) * curX / originalImageDim.x, y1 + (y2 - y1) * curY / originalImageDim.y);
-
-			int realQout = (curCompl.real() / grid);
-			realQout = (realQout % 2 + 2) % 2;
-
-			int imagQout = (curCompl.imag() / grid);
-			imagQout = (imagQout % 2 + 2) % 2;
-
-			bool isGrid = (imagQout == realQout);
-
+			complex curCompl(x1 + c1 * curX, y1 + c2 * curY );
 
 
 			complex imCompl = evaluator.evaluate(curCompl);
-			//complex imCompl = (curCompl * (curCompl + complex(2.0f, 1.0f)) * (curCompl + complex(1.0f, 1.0f)));
 
-			sf::Color color = imageToColour(imCompl, originalImageDim, x1, x2, y1, y2, isGrid);
+			sf::Color color = imageToColour(imCompl, originalImageDim, x1, x2, y1, y2);
 
 			image.setPixel(curX, curY, color);
 		}

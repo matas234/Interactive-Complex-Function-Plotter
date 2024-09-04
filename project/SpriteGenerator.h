@@ -19,10 +19,11 @@ using complex = std::complex<float>;
 
 
 
+
 void HSVtoRGB(float H, float S, float V, float& R, float& G, float& B);
 
 
-float normalizeAbs(float x, float low_value = 0, float scale = 0.1);
+float normalizeAbs(float x, float low_value = 0, float scale = 0.2);
 
 
 sf::Color imageToColour(const complex& c, const sf::Vector2u& windowSize,
@@ -45,22 +46,19 @@ public:
 
 	~SpriteGenerator();
 
-	void generateSprite(sf::Sprite& finalSprite, float zoom = 1, bool useBlur = false);
+	void generateSprite(sf::Sprite& finalSprite, float zoom = 1);
 
 	void setCenter(const std::pair<float, float>& center);
+
+	void setEvaluator(const UserFunctionEvaluator& evaluator);
 
 private:
 	unsigned int imageScaleFactor;
 	UserFunctionEvaluator evaluator;
-
 	sf::Vector2u windowDim;
 	sf::Vector2u originalImageDim;
-
-	sf::Shader* shader;
 	sf::Texture* texture;
-	sf::RenderTexture* renderTexture;
 	std::function<complex(const complex&)> funcToMap;
-
 	std::pair<float, float> center;
 
 

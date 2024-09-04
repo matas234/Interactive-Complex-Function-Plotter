@@ -12,6 +12,7 @@
 #include <cctype>
 
 
+
 using std::string, std::vector, std::stack, std::unordered_set, std::unordered_map;
 
 using std::cout, std::endl;
@@ -20,16 +21,6 @@ using complex = std::complex<float>;
 
 using Variant_Type = std::variant<complex, string>;
 
-complex sinFunction(const complex& z);
-complex cosFunction(const complex& z);
-complex tanFunction(const complex& z);
-complex sinhFunction(const complex& z);
-complex coshFunction(const complex& z);
-complex tanhFunction(const complex& z);
-complex expFunction(const complex& z);
-complex logFunction(const complex& z);
-complex absFunction(const complex& z);
-complex sqrtFunction(const complex& z);
 
 
 
@@ -51,23 +42,14 @@ public:
 
 private:
 	vector<Variant_Type> RPNfunction;
-	unordered_set<char> validOperators = { '+', '-', '/', '*','^' };
-	unordered_set<string> validFunctions = { "sin", "cos" , "tan", "sinh", "cosh", "tanh", "exp", "log", "abs", "sqrt" };
 
-	// hash map to store standard function pointers (probably need to add more)
-	std::unordered_map<std::string, complex(*)(const complex&)> ComplexFunctionMap = {
-		{ "sin", sinFunction },
-		{ "cos", cosFunction },
-		{ "tan", tanFunction },
-		{ "sinh", sinhFunction },
-		{ "cosh", coshFunction },
-		{ "tanh", tanhFunction },
-		{ "exp", expFunction },
-		{ "log", logFunction },
-		{ "abs", absFunction },
-		{ "sqrt", sqrtFunction}
-	};
-
+	static unordered_set<char> validOperators;
+	
+	static unordered_set<string> validFunctions;
+	
+	static unordered_map<string, complex(*)(const complex&)> ComplexFunctionMap;
+	
+	static unordered_map<string, complex(*)(const complex&, const complex&)> ComplexOperatorMap;
 
 
 	bool isValidOperator(const char token);
@@ -78,7 +60,24 @@ private:
 
 	vector<Variant_Type> infixToRPN(string postFix);
 
+	static complex sinFunction(const complex& z);
+	static complex cosFunction(const complex& z);
+	static complex tanFunction(const complex& z);
+	static complex sinhFunction(const complex& z);
+	static complex coshFunction(const complex& z);
+	static complex tanhFunction(const complex& z);
+	static complex expFunction(const complex& z);
+	static complex logFunction(const complex& z);
+	static complex absFunction(const complex& z);
+	static complex sqrtFunction(const complex& z);
+
+	static complex plusOperator(const complex& x, const complex& y);
+	static complex minusOperator(const complex& x, const complex& y);
+	static complex timesOperator(const complex& x, const complex& y);
+	static complex divideOperator(const complex& x, const complex& y);
 };
+
+
 
 
 #endif
